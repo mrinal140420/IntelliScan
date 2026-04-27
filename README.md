@@ -26,6 +26,12 @@ SecureHub IntelliScan analyzes source code from uploaded files, ZIP archives, or
 
 The frontend visualizes scan metrics, scan history, and report access. The backend handles scan orchestration, persistence, and report generation.
 
+## Live Deployment
+- Frontend: https://intelliscan-frontend.onrender.com
+- Backend API: https://intelliscan-q1rk.onrender.com
+- API Docs: https://intelliscan-q1rk.onrender.com/docs
+- Health Check: https://intelliscan-q1rk.onrender.com/health
+
 ## Key Features
 - Multi-input scanning:
   - upload source file(s) and ZIP archives
