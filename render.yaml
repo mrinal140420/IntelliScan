@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: intelliscan-backend
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt && pip install -r ../ml/requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: MONGODB_URL
+        sync: false
+      - key: DATABASE_NAME
+        value: IntelliScan
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: DEBUG
+        value: "False"
+      - key: ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_HOURS
+        value: "24"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "7"
+
+  - type: web
+    name: intelliscan-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
