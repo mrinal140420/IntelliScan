@@ -142,7 +142,7 @@ class ReportService:
             </div>
             """
         
-        html = f"""
+        report_html = f"""
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -396,7 +396,7 @@ class ReportService:
         </html>
         """
         
-        return html
+        return report_html
     
     @staticmethod
     def generate_json_report(
