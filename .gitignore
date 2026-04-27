@@ -33,7 +33,4 @@ Thumbs.db
 *.temp
 
 # Keep external upstream repo out of root deployment repo
-external/UDB-CA/.git/
-external/UDB-CA/node_modules/
-external/UDB-CA/dist/
-external/UDB-CA/build/
+external/UDB-CA/
