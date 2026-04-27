@@ -3,6 +3,7 @@
 import os
 import json
 import base64
+import html
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 from io import BytesIO
@@ -100,23 +101,43 @@ class ReportService:
             
             cvss = finding.get('cvss_score', 0)
             cwe = finding.get('cwe_id', 'N/A')
-            vuln_type = finding.get('type', 'Unknown').replace('_', ' ').title()
-            description = finding.get('description', 'No description')
+            vuln_type = str(finding.get('type', 'Unknown')).replace('_', ' ').title()
+            description = str(finding.get('description', 'No description'))
             line = finding.get('line_number', 0)
-            snippet = finding.get('code_snippet', '')
+            snippet = str(finding.get('code_snippet', ''))
+            file_path = str(finding.get('filename') or finding.get('file_path') or 'Unknown file')
+            normalized_path = file_path.replace('\\', '/')
+            folder_path = os.path.dirname(normalized_path) or '/'
+            source = str(finding.get('source') or finding.get('detection_method') or 'unknown')
+            confidence = float(finding.get('confidence', 0) or 0)
+
+            safe_vuln_type = html.escape(vuln_type)
+            safe_description = html.escape(description)
+            safe_snippet = html.escape(snippet)
+            safe_file_path = html.escape(normalized_path)
+            safe_folder_path = html.escape(folder_path)
+            safe_source = html.escape(source)
+
+            if str(cwe).isdigit():
+                cwe_text = f"CWE-{cwe}"
+            else:
+                cwe_text = str(cwe)
             
             findings_html += f"""
             <div class="finding" style="border-left: 4px solid {severity_color}; margin-bottom: 20px;">
                 <div class="finding-header">
-                    <span class="finding-type">{vuln_type}</span>
+                    <span class="finding-type">{safe_vuln_type}</span>
                     <span class="severity" style="background-color: {severity_color}">{severity}</span>
                 </div>
                 <div class="finding-details">
-                    <p><strong>Description:</strong> {description}</p>
-                    <p><strong>CVSS Score:</strong> {cvss}/10 | <strong>CWE:</strong> CWE-{cwe}</p>
-                    <p><strong>Location:</strong> Line {line}</p>
-                    {f'<p><strong>Code:</strong> <code style="background-color: #f3f4f6; padding: 8px; border-radius: 4px; display: block;">{snippet}</code></p>' if snippet else ''}
-                    {f'<p><strong>Suggested Fix:</strong> {finding.get("suggested_fix", "Review the vulnerable code and apply secure coding practices.")}</p>'}
+                    <p><strong>Description:</strong> {safe_description}</p>
+                    <p><strong>CVSS Score:</strong> {cvss}/10 | <strong>CWE:</strong> {cwe_text}</p>
+                    <p><strong>File:</strong> <code>{safe_file_path}</code></p>
+                    <p><strong>Folder:</strong> <code>{safe_folder_path}</code></p>
+                    <p><strong>Line:</strong> {line if line else 'N/A'}</p>
+                    <p><strong>Detector:</strong> {safe_source} | <strong>Confidence:</strong> {(confidence * 100):.0f}%</p>
+                    {f'<p><strong>Code:</strong> <code style="background-color: #f3f4f6; padding: 8px; border-radius: 4px; display: block;">{safe_snippet}</code></p>' if snippet else ''}
+                    {f'<p><strong>Suggested Fix:</strong> {html.escape(str(finding.get("suggested_fix", "Review the vulnerable code and apply secure coding practices.")))}</p>'}
                 </div>
             </div>
             """
